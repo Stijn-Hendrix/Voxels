@@ -1,0 +1,80 @@
+﻿#pragma kernel March
+
+#include "Includes\MarchingTable.compute"
+
+struct Triangle {
+    float3 a, b, c;
+};
+
+AppendStructuredBuffer<Triangle> triangles;
+RWStructuredBuffer<float> weights;
+
+uint trianglesCount;
+
+void AddTriangle(float3 a, float3 b, float3 c)
+{
+    Triangle tri;
+    tri.a = a;
+    tri.b = b;
+    tri.c = c;
+    triangles.Append(tri);
+    trianglesCount++;
+}
+
+const float isoLevel = 0.5;
+
+const int numPointsPerAxis = 2; // Single cube
+
+int indexFromCoord(int x, int y, int z)
+{
+    return z * numPointsPerAxis * numPointsPerAxis + y * numPointsPerAxis + x;
+}
+
+[numthreads(1, 1, 1)]
+void March (uint3 id : SV_DispatchThreadID)
+{
+    const float cubeValues[8] = {
+        weights[indexFromCoord(id.x, id.y, id.z + 1)],
+        weights[indexFromCoord(id.x + 1, id.y, id.z + 1)],
+        weights[indexFromCoord(id.x + 1, id.y, id.z)],
+        weights[indexFromCoord(id.x, id.y, id.z)],
+        weights[indexFromCoord(id.x, id.y + 1, id.z + 1)],
+        weights[indexFromCoord(id.x + 1, id.y + 1, id.z + 1)],
+        weights[indexFromCoord(id.x + 1, id.y + 1, id.z)],
+        weights[indexFromCoord(id.x, id.y + 1, id.z)]
+    };
+
+    int cubeIndex = 0;
+    if (cubeValues[0] < isoLevel) cubeIndex |= 1;
+    if (cubeValues[1] < isoLevel) cubeIndex |= 2;
+    if (cubeValues[2] < isoLevel) cubeIndex |= 4;
+    if (cubeValues[3] < isoLevel) cubeIndex |= 8;
+    if (cubeValues[4] < isoLevel) cubeIndex |= 16;
+    if (cubeValues[5] < isoLevel) cubeIndex |= 32;
+    if (cubeValues[6] < isoLevel) cubeIndex |= 64;
+    if (cubeValues[7] < isoLevel) cubeIndex |= 128;
+
+    int edges[] = triTable[cubeIndex];
+
+    for (int i = 0; edges[i] != -1; i += 3)
+    {
+        int edgeIndex = edges[i];
+
+        int e0 = edgeConnections[edgeIndex][0];
+        int e1 = edgeConnections[edgeIndex][1];
+
+        float3 p0 = (corners[e0] + id) + (isoLevel - cubeValues[e0]) * ((corners[e1] + id) - (corners[e0] + id)) / (cubeValues[e1] - cubeValues[e0]);
+
+        e0 = edgeConnections[edgeIndex + 1][0];
+        e1 = edgeConnections[edgeIndex + 1][1];
+
+        float3 p1 = (corners[e0] + id) + (isoLevel - cubeValues[e0]) * ((corners[e1] + id) - (corners[e0] + id)) / (cubeValues[e1] - cubeValues[e0]);
+
+        e0 = edgeConnections[edgeIndex + 2][0];
+        e1 = edgeConnections[edgeIndex + 2][1];
+
+        float3 p2 = (corners[e0] + id) + (isoLevel - cubeValues[e0]) * ((corners[e1] + id) - (corners[e0] + id)) / (cubeValues[e1] - cubeValues[e0]);
+
+        AddTriangle(p0, p1, p2);
+    }
+}

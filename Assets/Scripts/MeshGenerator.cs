@@ -84,7 +84,7 @@ public class MeshGenerator : MonoBehaviour
 	void CreateBuffers() {
 		_trianglesBuffer = new ComputeBuffer(5 * (ChunkSize * ChunkSize * ChunkSize), Triangle.SizeOf, ComputeBufferType.Append);
 		_trianglesCountBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
-		_weightsBuffer = new ComputeBuffer(((ChunkSize + 1) * (ChunkSize + 1) * (ChunkSize + 1)), sizeof(float));
+		_weightsBuffer = new ComputeBuffer(ChunkSize * ChunkSize * ChunkSize, sizeof(float));
 	}
 
 	void DisposeBuffers() {

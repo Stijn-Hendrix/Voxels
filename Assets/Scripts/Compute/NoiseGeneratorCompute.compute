@@ -22,13 +22,13 @@ void GenerateNoise(uint3 id : SV_DispatchThreadID)
     }
 
     float noiseScale = 0.08;
-    float amplitude = 1;
+    float amplitude = 3;
 
-    float noise = 1;
+    float layer1 = snoise(id * noiseScale) * amplitude;
+    float layer2 = snoise(id * (noiseScale + .1));
 
-   
-        float layer1 = snoise(id * noiseScale) * amplitude;
-        float layer2 = snoise(id * (noiseScale + .1));
+    float noise = layer1;
+        
 
 
         float baseGround = layer1 + layer2;
@@ -42,7 +42,7 @@ void GenerateNoise(uint3 id : SV_DispatchThreadID)
             baseGround += 2;
             if (baseGround >= 0)
             {
-                noise = 1;
+                noise += 1;
             }
             else
             {

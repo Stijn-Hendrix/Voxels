@@ -29,7 +29,7 @@ public class MeshGenerator : MonoBehaviour
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
 
 		Shader.SetInt("numPointsPerAxis", ChunkSize);
-		Shader.SetFloat("isoLevel", 0.5f);
+		Shader.SetFloat("isoLevel", .5f);
 
 		_weightsBuffer.SetData(weights);
 		_trianglesBuffer.SetCounterValue(0);

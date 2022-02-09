@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -385,6 +385,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1187238012}
   - component: {fileID: 1187238013}
+  - component: {fileID: 1187238014}
   m_Layer: 0
   m_Name: Mesh Generator
   m_TagString: Untagged
@@ -421,3 +422,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Shader: {fileID: 7200000, guid: 78e4d27ac32c8a7469d8609fca73912e, type: 3}
   MeshFilterDisplay: {fileID: 1177329974}
+--- !u!114 &1187238014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1187238011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fa08f28f4d15f9408f0858eb209e710, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Shader: {fileID: 7200000, guid: e22b63200c5f0ad4c844c64d562813da, type: 3}
+  MeshGenerator: {fileID: 1187238013}

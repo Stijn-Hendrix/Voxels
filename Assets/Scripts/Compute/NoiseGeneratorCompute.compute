@@ -1,0 +1,55 @@
+﻿#pragma kernel GenerateNoise
+
+#include "Includes\Noise.compute"
+
+RWStructuredBuffer<float> weights;
+
+int numPointsPerAxis;
+
+float noiseScale = 0.08;
+float amplitude = 3;
+
+int indexFromCoord(int x, int y, int z)
+{
+    return x + numPointsPerAxis * (y + numPointsPerAxis * z);
+}
+
+[numthreads(8,8,8)]
+void GenerateNoise(uint3 id : SV_DispatchThreadID)
+{
+    if (id.y - 1 >= numPointsPerAxis || id.z - 1 >= numPointsPerAxis ||
+        id.x == 0 || id.y == 0 || id.z == 0)
+    {
+        return;
+    }
+
+    float noise = 1;
+
+    if (id.y != 0)
+    {
+        float layer1 = snoise(id * noiseScale) * amplitude;
+        float layer2 = snoise(id * (noiseScale + .1));
+
+
+        float baseGround = layer1 + layer2;
+
+        if (id.y >= numPointsPerAxis * .5 + baseGround)
+        {
+            noise = 0;
+        }
+        else
+        {
+            baseGround += 2;
+            if (baseGround >= 0)
+            {
+                noise = 1;
+            }
+            else
+            {
+                noise = 0;
+            }
+        }
+    }
+
+    weights[indexFromCoord(id.x, id.y, id.z)] = noise;
+}

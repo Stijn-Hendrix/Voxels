@@ -2,20 +2,16 @@
 
 #include "Includes\MarchingTable.compute"
 
-
 RWStructuredBuffer<float> weights;
-RWStructuredBuffer<int> test;
 
 static const float isoLevel = 0.5;
-static const int numPointsPerAxis = 2; // Single cube
-
+int numPointsPerAxis;
 
 struct Triangle {
     float3 a, b, c;
 };
 
 AppendStructuredBuffer<Triangle> triangles;
-
 
 void AddTriangle(float3 a, float3 b, float3 c)
 {
@@ -32,9 +28,14 @@ int indexFromCoord(int x, int y, int z)
     return x + numPointsPerAxis * (y + numPointsPerAxis * z);
 }
 
-[numthreads(1, 1, 1)]
+[numthreads(8, 8, 8)]
 void March (uint3 id : SV_DispatchThreadID)
 {
+    if (id.x - 1 >= numPointsPerAxis || id.y - 1 >= numPointsPerAxis || id.z - 1 >= numPointsPerAxis ||
+        id.x == 0 || id.y == 0 || id.z == 0)
+    {
+        return;
+    }
 
     const float cubeValues[8] = {
        weights[indexFromCoord(id.x, id.y, id.z + 1)],
@@ -47,7 +48,6 @@ void March (uint3 id : SV_DispatchThreadID)
        weights[indexFromCoord(id.x, id.y + 1, id.z)]
     };
 
-
     int cubeIndex = 0;
     if (cubeValues[0] < isoLevel) cubeIndex |= 1;
     if (cubeValues[1] < isoLevel) cubeIndex |= 2;
@@ -57,8 +57,6 @@ void March (uint3 id : SV_DispatchThreadID)
     if (cubeValues[5] < isoLevel) cubeIndex |= 32;
     if (cubeValues[6] < isoLevel) cubeIndex |= 64;
     if (cubeValues[7] < isoLevel) cubeIndex |= 128;
-
-    test[0] = cubeIndex;
 
     int edges[] = triTable[cubeIndex];
 

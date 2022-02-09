@@ -12,38 +12,29 @@ public class MeshGenerator : MonoBehaviour
 	ComputeBuffer _trianglesCountBuffer;
 	ComputeBuffer _weightsBuffer;
 
-	ComputeBuffer _testBuffer;
+	public const int ChunkSize = 32;
 
 	struct Triangle {
 		public Vector3 a;
 		public Vector3 b;
 		public Vector3 c;
+
+		public static int SizeOf => sizeof(float) * 3 * 3;
 	}
 
-	private void Start() {
-		Run();
-	}
-
-	void Run() {
+	public void Run(float[] weights) {
 		CreateBuffers();
 
-		float[] weights = new float[8] {
-			0f, 1f, 1f, 1f, 1f, 1f, 1f, 1f
-		};
-
-		Shader.SetBuffer(0, "test", _testBuffer);
 		Shader.SetBuffer(0, "triangles", _trianglesBuffer);
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
+
+		Shader.SetInt("numPointsPerAxis", ChunkSize);
 
 		_weightsBuffer.SetData(weights);
 		_trianglesBuffer.SetCounterValue(0);
 
-		Shader.Dispatch(0, 1, 1, 1);
+		Shader.Dispatch(0, ChunkSize / 8, ChunkSize / 8, ChunkSize / 8);
 
-		int[] test = { 0 };
-
-		_testBuffer.GetData(test);
-		Debug.Log("test: " + test[0]);
 
 		int triCount = ReadTriangleCount();
 
@@ -91,17 +82,15 @@ public class MeshGenerator : MonoBehaviour
 	}
 
 	void CreateBuffers() {
-		_trianglesBuffer = new ComputeBuffer(5, sizeof(float) * 3 * 3, ComputeBufferType.Append);
+		_trianglesBuffer = new ComputeBuffer(5 * (ChunkSize * ChunkSize * ChunkSize), Triangle.SizeOf, ComputeBufferType.Append);
 		_trianglesCountBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
-		_testBuffer = new ComputeBuffer(1, sizeof(int));
-		_weightsBuffer = new ComputeBuffer(8, sizeof(float));
+		_weightsBuffer = new ComputeBuffer(((ChunkSize + 1) * (ChunkSize + 1) * (ChunkSize + 1)), sizeof(float));
 	}
 
 	void DisposeBuffers() {
 		_trianglesBuffer.Dispose();
 		_trianglesCountBuffer.Dispose();
 		_weightsBuffer.Dispose();
-		_testBuffer.Dispose();
 	}
 
 	void Display(Mesh mesh) {

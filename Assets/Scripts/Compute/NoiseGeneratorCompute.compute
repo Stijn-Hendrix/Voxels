@@ -6,8 +6,7 @@ RWStructuredBuffer<float> weights;
 
 int numPointsPerAxis;
 
-float noiseScale = 0.08;
-float amplitude = 3;
+
 
 int indexFromCoord(int x, int y, int z)
 {
@@ -17,16 +16,17 @@ int indexFromCoord(int x, int y, int z)
 [numthreads(8,8,8)]
 void GenerateNoise(uint3 id : SV_DispatchThreadID)
 {
-    if (id.y - 1 >= numPointsPerAxis || id.z - 1 >= numPointsPerAxis ||
-        id.x == 0 || id.y == 0 || id.z == 0)
+    if (id.x >= numPointsPerAxis - 1 || id.y >= numPointsPerAxis - 1 || id.z >= numPointsPerAxis - 1)
     {
         return;
     }
 
+    float noiseScale = 0.08;
+    float amplitude = 1;
+
     float noise = 1;
 
-    if (id.y != 0)
-    {
+   
         float layer1 = snoise(id * noiseScale) * amplitude;
         float layer2 = snoise(id * (noiseScale + .1));
 
@@ -49,7 +49,6 @@ void GenerateNoise(uint3 id : SV_DispatchThreadID)
                 noise = 0;
             }
         }
-    }
 
     weights[indexFromCoord(id.x, id.y, id.z)] = noise;
 }

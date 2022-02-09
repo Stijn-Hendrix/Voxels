@@ -29,12 +29,12 @@ public class MeshGenerator : MonoBehaviour
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
 
 		Shader.SetInt("numPointsPerAxis", ChunkSize);
+		Shader.SetFloat("isoLevel", 0.5f);
 
 		_weightsBuffer.SetData(weights);
 		_trianglesBuffer.SetCounterValue(0);
 
 		Shader.Dispatch(0, ChunkSize / 8, ChunkSize / 8, ChunkSize / 8);
-
 
 		int triCount = ReadTriangleCount();
 

@@ -38,7 +38,7 @@ public class MeshGenerator : MonoBehaviour
 
 		int triCount = ReadTriangleCount();
 
-		Debug.Log("tri count: " + triCount);
+		//Debug.Log("tri count: " + triCount);
 
 		Triangle[] triangles = new Triangle[triCount];
 		_trianglesBuffer.GetData(triangles);

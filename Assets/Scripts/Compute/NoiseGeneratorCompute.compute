@@ -1,6 +1,6 @@
 ﻿#pragma kernel GenerateNoise
 
-#include "Includes\Noise.compute"
+#include "Includes\FastNoiseLite.compute"
 
 RWStructuredBuffer<float> weights;
 
@@ -8,7 +8,8 @@ int numPointsPerAxis;
 
 float3 position;
 
-
+float noiseScale;
+float amplitude;
 
 int indexFromCoord(int x, int y, int z)
 {
@@ -18,20 +19,19 @@ int indexFromCoord(int x, int y, int z)
 [numthreads(8,8,8)]
 void GenerateNoise(uint3 id : SV_DispatchThreadID)
 {
-    float noiseScale = 0.08;
-    float amplitude = 3;
 
-    float frequency = 0.01f;
+
+    fnl_state noise = fnlCreateState();
+    noise.noise_type = FNL_NOISE_OPENSIMPLEX2;
+    noise.fractal_type = FNL_FRACTAL_RIDGED;
+    noise.frequency = 0.004;
+    noise.octaves = 6;
 
     float3 pos = id + position;
 
-    float layer1 = snoise(pos * noiseScale) * amplitude;
-    float layer2 = snoise(pos * (noiseScale + .1));
-
-    
     float ground = -pos.y + (0.5 * numPointsPerAxis);
     
-    float noise = ground + snoise(pos * noiseScale) * amplitude;
+    float n = ground + fnlGetNoise3D(noise, pos.x, pos.y, pos.z) * noiseScale * amplitude;
 
-    weights[indexFromCoord(id.x, id.y, id.z)] = noise;
+    weights[indexFromCoord(id.x, id.y, id.z)] = n;
 }

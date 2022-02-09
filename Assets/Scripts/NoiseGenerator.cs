@@ -25,6 +25,8 @@ public class NoiseGenerator : MonoBehaviour
 
 		Shader.SetInt("numPointsPerAxis", MeshGenerator.ChunkSize);
 		Shader.SetVector("position", transform.position);
+		Shader.SetFloat("noiseScale", 0.08f);
+		Shader.SetFloat("amplitude", 200);
 
 		Shader.Dispatch(0, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8);
 

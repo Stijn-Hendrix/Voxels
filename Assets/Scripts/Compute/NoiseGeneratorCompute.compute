@@ -27,7 +27,7 @@ void GenerateNoise(uint3 id : SV_DispatchThreadID)
 
     float3 pos = id + position;
 
-    float ground = -pos.y + (0.5 * numPointsPerAxis);
+    float ground = -pos.y + (0.2 * numPointsPerAxis);
     
     float n = ground + fnlGetNoise3D(noise, pos.x, pos.y, pos.z) * noiseScale * amplitude;
 

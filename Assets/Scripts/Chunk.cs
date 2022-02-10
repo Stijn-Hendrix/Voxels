@@ -5,14 +5,16 @@ using UnityEngine;
 public class Chunk : MonoBehaviour
 {
 
-	float[] heights;
+	public float[] weights;
 
 	public MeshFilter MeshFilterDisplay;
 
 	public MeshCollider MeshCollider;
 
+	public Chunk other;
+
 	private void Start() {
-		heights = NoiseGenerator.instance.Run(transform.position);
+		weights = NoiseGenerator.instance.Run(transform.position);
 
 	}
 
@@ -22,19 +24,9 @@ public class Chunk : MonoBehaviour
 		this.enabled = false;
 	}
 
-	public void EditHeights(Vector3 globalOrigin) {
-		Vector3Int localOrigin = ToLocalOrigin(globalOrigin);
-
-		for (int x = localOrigin.x - 2; x < localOrigin.x + 2; x++) {
-
-			for (int y = localOrigin.y - 2; y < localOrigin.y + 2; y++) {
-
-				for (int z = localOrigin.z - 2; z < localOrigin.z + 2; z++) {
-					heights[indexFromCoord(x, y, z)] += 1;
-				}
-			}
-		}
-
+	public void EditWeights(Vector3 globalOrigin) {
+		WeightsUpdater.instance.UpdateChunkAt(this, globalOrigin);
+	
 		RequestUpdate();
 	}
 
@@ -55,7 +47,7 @@ public class Chunk : MonoBehaviour
 	}
 
 	void InstantUpdateMesh() {
-		Mesh mesh = MeshGenerator.instance.Run(heights);
+		Mesh mesh = MeshGenerator.instance.Run(weights);
 		MeshCollider.sharedMesh = mesh;
 		Display(mesh);
 	}

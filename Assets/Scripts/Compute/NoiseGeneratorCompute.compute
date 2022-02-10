@@ -2,6 +2,8 @@
 
 #include "Includes\FastNoiseLite.compute"
 
+static const uint numThreads = 8;
+
 RWStructuredBuffer<float> weights;
 
 int numPointsPerAxis;
@@ -16,7 +18,7 @@ int indexFromCoord(int x, int y, int z)
     return x + numPointsPerAxis * (y + numPointsPerAxis * z);
 }
 
-[numthreads(8,8,8)]
+[numthreads(numThreads, numThreads, numThreads)]
 void GenerateNoise(uint3 id : SV_DispatchThreadID)
 {
     fnl_state noise = fnlCreateState();

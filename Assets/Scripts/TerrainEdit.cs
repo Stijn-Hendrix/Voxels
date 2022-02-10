@@ -16,7 +16,7 @@ public class TerrainEdit : MonoBehaviour
 				hitPoint = hit.point;
 
 				var chunk = hit.collider.GetComponentInParent<Chunk>();
-				chunk.EditHeights(hitPoint);
+				chunk.EditWeights(hitPoint);
 			}
 		}
 	}

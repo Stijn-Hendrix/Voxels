@@ -2,6 +2,8 @@
 
 #include "Includes\MarchingTable.compute"
 
+static const uint numThreads = 8;
+
 RWStructuredBuffer<float> weights;
 
 float isoLevel;
@@ -23,7 +25,7 @@ float3 interp(float3 p1, float w1, float3 p2, float w2)
     return (p1 + (isoLevel - w1) * (p2 - p1)  / (w2 - w1));
 }
 
-[numthreads(8, 8, 8)]
+[numthreads(numThreads, numThreads, numThreads)]
 void March (uint3 id : SV_DispatchThreadID)
 {
     if (id.x >= numPointsPerAxis - 1 || id.y >= numPointsPerAxis - 1 || id.z >= numPointsPerAxis - 1)

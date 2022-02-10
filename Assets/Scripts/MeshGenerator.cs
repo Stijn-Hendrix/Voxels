@@ -6,8 +6,6 @@ public class MeshGenerator : MonoBehaviour
 {
 	public ComputeShader Shader;
 
-	public MeshFilter MeshFilterDisplay;
-
 	ComputeBuffer _trianglesBuffer;
 	ComputeBuffer _trianglesCountBuffer;
 	ComputeBuffer _weightsBuffer;
@@ -18,6 +16,11 @@ public class MeshGenerator : MonoBehaviour
 
 	private void Awake() {
 		instance = this;
+		CreateBuffers();
+	}
+
+	private void OnDestroy() {
+		DisposeBuffers();
 	}
 
 	struct Triangle {
@@ -29,7 +32,6 @@ public class MeshGenerator : MonoBehaviour
 	}
 
 	public Mesh Run(float[] weights) {
-		CreateBuffers();
 
 		Shader.SetBuffer(0, "triangles", _trianglesBuffer);
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
@@ -45,7 +47,6 @@ public class MeshGenerator : MonoBehaviour
 		Triangle[] triangles = new Triangle[ReadTriangleCount()];
 		_trianglesBuffer.GetData(triangles);
 
-		DisposeBuffers();
 
 		return CreateMesh(triangles);
 	}

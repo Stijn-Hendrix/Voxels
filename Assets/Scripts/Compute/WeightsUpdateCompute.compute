@@ -1,0 +1,26 @@
+﻿#pragma kernel UpdateWeights
+
+static const uint numThreads = 8;
+
+RWStructuredBuffer<float> weights;
+
+int numPointsPerAxis;
+
+float3 hitPosition;
+float3 myPosition;
+
+int indexFromCoord(int x, int y, int z)
+{
+    return x + numPointsPerAxis * (y + numPointsPerAxis * z);
+}
+
+[numthreads(numThreads, numThreads, numThreads)]
+void UpdateWeights (uint3 id : SV_DispatchThreadID)
+{
+    float3 pos = myPosition + id;
+
+    if (distance(pos, hitPosition) < 3)
+    {
+        weights[indexFromCoord(id.x, id.y, id.z)] += 1;
+    }
+}

@@ -8,15 +8,13 @@ public class NoiseGenerator : MonoBehaviour
 
 	ComputeBuffer _weightsBuffer;
 
-	public MeshGenerator MeshGenerator;
+	public static NoiseGenerator instance;
 
-	private void Start() {
-		var heights = Run();
-
-		MeshGenerator.Run(heights);
+	private void Awake() {
+		instance = this;
 	}
 
-	float[] Run() {
+	public float[] Run(Vector3 position) {
 		CreateBuffers();
 
 		float[] heights = new float[MeshGenerator.ChunkSize * MeshGenerator.ChunkSize * MeshGenerator.ChunkSize];
@@ -24,7 +22,7 @@ public class NoiseGenerator : MonoBehaviour
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
 
 		Shader.SetInt("numPointsPerAxis", MeshGenerator.ChunkSize);
-		Shader.SetVector("position", transform.position);
+		Shader.SetVector("position", position);
 		Shader.SetFloat("noiseScale", 0.08f);
 		Shader.SetFloat("amplitude", 200);
 

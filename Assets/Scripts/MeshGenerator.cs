@@ -12,7 +12,13 @@ public class MeshGenerator : MonoBehaviour
 	ComputeBuffer _trianglesCountBuffer;
 	ComputeBuffer _weightsBuffer;
 
+	public static MeshGenerator instance;
+
 	public const int ChunkSize = 32;
+
+	private void Awake() {
+		instance = this;
+	}
 
 	struct Triangle {
 		public Vector3 a;
@@ -22,7 +28,7 @@ public class MeshGenerator : MonoBehaviour
 		public static int SizeOf => sizeof(float) * 3 * 3;
 	}
 
-	public void Run(float[] weights) {
+	public Mesh Run(float[] weights) {
 		CreateBuffers();
 
 		Shader.SetBuffer(0, "triangles", _trianglesBuffer);
@@ -36,18 +42,12 @@ public class MeshGenerator : MonoBehaviour
 
 		Shader.Dispatch(0, ChunkSize / 8, ChunkSize / 8, ChunkSize / 8);
 
-		int triCount = ReadTriangleCount();
-
-		//Debug.Log("tri count: " + triCount);
-
-		Triangle[] triangles = new Triangle[triCount];
+		Triangle[] triangles = new Triangle[ReadTriangleCount()];
 		_trianglesBuffer.GetData(triangles);
 
-		Mesh mesh = CreateMesh(triangles);
-
-		Display(mesh);
-
 		DisposeBuffers();
+
+		return CreateMesh(triangles);
 	}
 
 	// Read triangles count from the buffer
@@ -91,9 +91,5 @@ public class MeshGenerator : MonoBehaviour
 		_trianglesBuffer.Dispose();
 		_trianglesCountBuffer.Dispose();
 		_weightsBuffer.Dispose();
-	}
-
-	void Display(Mesh mesh) {
-		MeshFilterDisplay.sharedMesh = mesh;
 	}
 }

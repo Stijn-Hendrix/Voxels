@@ -20,19 +20,20 @@ public class WeightsUpdater : MonoBehaviour
 		DisposeBuffers();
 	}
 
-	public void UpdateChunkAt(Chunk chunk, Vector3 globalPosition) {
+	public void UpdateChunkAt(Chunk chunk, Vector3 globalPosition, float brushSize) {
 
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
-		_weightsBuffer.SetData(chunk.weights);
+		_weightsBuffer.SetData(chunk.Weights);
 
 		Shader.SetInt("numPointsPerAxis", MeshGenerator.ChunkSize);
 		Shader.SetVector("hitPosition", globalPosition);
 		Shader.SetVector("myPosition", chunk.transform.position);
+		Shader.SetFloat("brushSize", brushSize);
 
 
 		Shader.Dispatch(0, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8);
 
-		_weightsBuffer.GetData(chunk.weights);
+		_weightsBuffer.GetData(chunk.Weights);
 	}
 
 	Vector3 ToLocalOrigin(Chunk chunk, Vector3 globalOrigin) {

@@ -9,6 +9,8 @@ int numPointsPerAxis;
 float3 hitPosition;
 float3 myPosition;
 
+float brushSize;
+
 int indexFromCoord(int x, int y, int z)
 {
     return x + numPointsPerAxis * (y + numPointsPerAxis * z);
@@ -19,7 +21,7 @@ void UpdateWeights (uint3 id : SV_DispatchThreadID)
 {
     float3 pos = myPosition + id;
 
-    if (distance(pos, hitPosition) < 3)
+    if (distance(pos, hitPosition) <= brushSize)
     {
         weights[indexFromCoord(id.x, id.y, id.z)] += 1;
     }

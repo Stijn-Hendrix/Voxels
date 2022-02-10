@@ -4,25 +4,22 @@ using UnityEngine;
 
 public class TerrainEdit : MonoBehaviour
 {
-	Vector3 hitPoint;
+	private Vector3 _hitPoint;
+
+	public float BrushSize = 2;
 
 	private void LateUpdate() {
-
 		if (Input.GetMouseButton(0)) {
 			RaycastHit hit;
 
-
 			if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 1000)) {
-				hitPoint = hit.point;
-
-				var chunk = hit.collider.GetComponentInParent<Chunk>();
-				chunk.EditWeights(hitPoint);
+				ChunkManager.instance.EditWeights(hit.point, BrushSize);
 			}
 		}
 	}
 
 	private void OnDrawGizmos() {
 		Gizmos.color = Color.yellow;
-		Gizmos.DrawWireSphere(hitPoint, 4);
+		Gizmos.DrawWireSphere(_hitPoint, BrushSize);
 	}
 }

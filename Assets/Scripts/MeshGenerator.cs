@@ -12,7 +12,7 @@ public class MeshGenerator : MonoBehaviour
 
 	public static MeshGenerator instance;
 
-	public const int ChunkSize = 32;
+	public const int ChunkSize = 48;
 
 	private void Awake() {
 		instance = this;

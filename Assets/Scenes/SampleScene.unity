@@ -371,7 +371,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 1256522958114542827, guid: 4d3c169f812c5044c83ecc9ffb0d37dd,
     type: 3}
-  viewDistance: 10
+  viewDistance: 4
 --- !u!4 &998498867
 Transform:
   m_ObjectHideFlags: 0

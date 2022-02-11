@@ -17,7 +17,7 @@ public class Chunk : MonoBehaviour
 	}
 
 	private void Update() {
-		InstantUpdateMesh();
+		MeshGenerator.instance.RequestMeshData(OnReceiveMeshData, Weights);
 		this.enabled = false;
 	}
 
@@ -30,10 +30,11 @@ public class Chunk : MonoBehaviour
 		this.enabled = true;
 	}
 
-	void InstantUpdateMesh() {
-		Mesh _mesh = MeshGenerator.instance.Run(Weights);
-		MeshCollider.sharedMesh = _mesh;
-		Display(_mesh);
+	void OnReceiveMeshData(MeshData meshData) {
+		Mesh mesh = meshData.Get();
+
+		MeshCollider.sharedMesh = mesh;
+		Display(mesh);
 	}
 
 	void Display(Mesh mesh) {

@@ -43,9 +43,9 @@ public class ChunkManager : MonoBehaviour
 	}
 
 	public void EditWeights(Vector3 globalPosition, float brushSize) {
-		// Add 2 to make sure you check a slightly larger range than brush size
+		// Add 5 to make sure you check a slightly larger range than brush size
 		// avoids cracks when editing with brush size just on the edge between chunks
-		float brushSizeSqrd = brushSize * brushSize + 2;
+		float brushSizeSqrd = brushSize * brushSize + 5;
 
 		foreach (var chunk in _currentlyEnabledChunks) {
 			if (chunk.Bounds.SqrDistance(globalPosition) < brushSizeSqrd) {

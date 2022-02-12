@@ -14,6 +14,8 @@ public class Chunk : MonoBehaviour
 
 	private void Start() {
 		Weights = NoiseGenerator.instance.Run(transform.position);
+
+		MeshCollider.sharedMesh = new Mesh();
 	}
 
 	private void Update() {
@@ -31,7 +33,11 @@ public class Chunk : MonoBehaviour
 	}
 
 	void OnReceiveMeshData(MeshData meshData) {
-		Mesh mesh = meshData.Get();
+		Mesh mesh = MeshCollider.sharedMesh;
+		mesh.Clear();
+		mesh.vertices = meshData.vertices;
+		mesh.triangles = meshData.triangles;
+		mesh.RecalculateNormals();
 
 		MeshCollider.sharedMesh = mesh;
 		Display(mesh);

@@ -8,6 +8,10 @@ public class MeshGenerator : MonoBehaviour
 {
 	public ComputeShader Shader;
 
+	// Multithreading mesh data might have a bug, not sure if this is because of Unity or because of me
+	[Tooltip("NOT RECOMMENDED, MIGHT BE BUGGY")]
+	public bool useMultithreading; 
+
 	ComputeBuffer _trianglesBuffer;
 	ComputeBuffer _trianglesCountBuffer;
 	ComputeBuffer _weightsBuffer;
@@ -50,11 +54,15 @@ public class MeshGenerator : MonoBehaviour
 		Triangle[] triangles = new Triangle[ReadTriangleCount()];
 		_trianglesBuffer.GetData(triangles);
 
-
-		ThreadStart threadStart = delegate {
-			MeshDataThread(callback, triangles);
-		};
-		new Thread(threadStart).Start();
+		if (!useMultithreading) {
+			callback(CreateMesh(triangles));
+		}
+		else {
+			ThreadStart threadStart = delegate {
+				MeshDataThread(callback, triangles);
+			};
+			new Thread(threadStart).Start();
+		}
 	}
 
 	void MeshDataThread(Action<MeshData> callback, Triangle[] triangles) {
@@ -119,13 +127,5 @@ public struct MeshData {
 	public MeshData(int[] triangles, Vector3[] vertices) {
 		this.triangles = triangles;
 		this.vertices = vertices;
-	}
-
-	public Mesh Get() {
-		Mesh mesh = new Mesh();
-		mesh.vertices = vertices;
-		mesh.triangles = triangles;
-		mesh.RecalculateNormals();
-		return mesh;
 	}
 }

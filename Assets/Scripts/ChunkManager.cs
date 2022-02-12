@@ -4,40 +4,31 @@ using UnityEngine;
 
 public class ChunkManager : MonoBehaviour
 {
-    [SerializeField] Chunk chunkPrefab;
-
-
 	[SerializeField] int viewDistance;
 
-	List<Chunk> _currentlyEnabledChunks;
+	[Header("References")]
+    [SerializeField] Chunk chunkPrefab;
+	[SerializeField] MeshGenerator MeshGenerator;
+	[SerializeField] NoiseGenerator NoiseGenerator;
 
-	Dictionary<Vector3Int, Chunk> _chunkDictionary;
-
-	public static ChunkManager instance;
-
-	private void Awake() {
-		instance = this;
-
-		_chunkDictionary = new Dictionary<Vector3Int, Chunk>();
-		_currentlyEnabledChunks = new List<Chunk>();
-
-	}
+	List<Chunk> _currentlyEnabledChunks = new List<Chunk>();
+	Dictionary<Vector3Int, Chunk> _chunkDictionary = new Dictionary<Vector3Int, Chunk>();
 
 	private void Start() {
 		for (int x = -viewDistance; x < viewDistance; x++) {
 			for (int z = -viewDistance; z < viewDistance; z++) {
 
-				Vector3 pos = new Vector3(x * (MeshGenerator.ChunkSize - 1), 0, z * (MeshGenerator.ChunkSize - 1));
+				Vector3 chunkPos = new Vector3(x * (MeshGenerator.ChunkSize - 1), 0, z * (MeshGenerator.ChunkSize - 1));
 
-				var chunk = Instantiate(chunkPrefab, pos, Quaternion.identity, transform);
+				Chunk chunk = Instantiate(chunkPrefab, chunkPos, Quaternion.identity, transform);
+				chunk.Initialize(MeshGenerator, NoiseGenerator);
 
-				var boundsCenter = pos + (Vector3.one * ((MeshGenerator.ChunkSize - 1) / 2));
+				Vector3 boundsCenterPos = chunkPos + (Vector3.one * ((MeshGenerator.ChunkSize - 1) / 2));
 
-				chunk.Bounds = new Bounds(boundsCenter, Vector3.one * (MeshGenerator.ChunkSize - 1));
+				chunk.Bounds = new Bounds(boundsCenterPos, Vector3.one * (MeshGenerator.ChunkSize - 1));
+				chunk.name = $"{ToChunkPosition(chunkPos).ToString()}";
 
-				chunk.name = $"{ToChunkPosition(pos).ToString()}";
-
-				_chunkDictionary.Add(ToChunkPosition(pos), chunk);
+				_chunkDictionary.Add(ToChunkPosition(chunkPos), chunk);
 				_currentlyEnabledChunks.Add(chunk);
 			}
 		}

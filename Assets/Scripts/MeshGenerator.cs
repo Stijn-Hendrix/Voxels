@@ -16,14 +16,11 @@ public class MeshGenerator : MonoBehaviour
 	ComputeBuffer _trianglesCountBuffer;
 	ComputeBuffer _weightsBuffer;
 
-	public static MeshGenerator instance;
-
 	public const int ChunkSize = 40;
 
 	Queue<ThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<ThreadInfo<MeshData>>();
 
 	private void Awake() {
-		instance = this;
 		CreateBuffers();
 	}
 

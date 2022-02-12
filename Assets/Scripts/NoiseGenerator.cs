@@ -8,10 +8,7 @@ public class NoiseGenerator : MonoBehaviour
 
 	ComputeBuffer _weightsBuffer;
 
-	public static NoiseGenerator instance;
-
 	private void Awake() {
-		instance = this;
 		CreateBuffers();
 	}
 

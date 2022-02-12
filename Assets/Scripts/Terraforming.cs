@@ -2,9 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TerrainEdit : MonoBehaviour
+public class Terraforming : MonoBehaviour
 {
-	private Vector3 _hitPoint;
+	[SerializeField]
+	ChunkManager ChunkManager;
+
+	Vector3 _hitPoint;
+	Camera _cam;
+
+	private void Awake() {
+		_cam = GetComponent<Camera>();
+	}
 
 	public float BrushSize = 2;
 
@@ -12,8 +20,8 @@ public class TerrainEdit : MonoBehaviour
 		if (Input.GetMouseButton(0)) {
 			RaycastHit hit;
 
-			if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 1000)) {
-				ChunkManager.instance.EditWeights(hit.point, BrushSize);
+			if (Physics.Raycast(_cam.ScreenPointToRay(Input.mousePosition), out hit, 1000)) {
+				ChunkManager.EditWeights(hit.point, BrushSize);
 			}
 		}
 	}

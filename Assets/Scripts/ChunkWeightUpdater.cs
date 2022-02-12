@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeightsUpdater : MonoBehaviour
+public class ChunkWeightUpdater : MonoBehaviour
 {
-
 	public ComputeShader Shader;
 
-	public static WeightsUpdater instance;
+	public static ChunkWeightUpdater instance;
 
 	ComputeBuffer _weightsBuffer;
 
@@ -21,8 +20,6 @@ public class WeightsUpdater : MonoBehaviour
 	}
 
 	public void UpdateChunkAt(Chunk chunk, Vector3 globalPosition, float brushSize) {
-		//CreateBuffers();
-
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
 		_weightsBuffer.SetData(chunk.Weights);
 
@@ -30,7 +27,6 @@ public class WeightsUpdater : MonoBehaviour
 		Shader.SetVector("hitPosition", globalPosition);
 		Shader.SetVector("myPosition", chunk.transform.position);
 		Shader.SetFloat("brushSize", brushSize);
-
 
 		Shader.Dispatch(0, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8);
 

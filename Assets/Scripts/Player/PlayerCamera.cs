@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MouseLook : MonoBehaviour
+public class PlayerCamera : MonoBehaviour
 {
     [SerializeField] float sensitivity = 100f;
 

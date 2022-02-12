@@ -7,24 +7,27 @@ public class Chunk : MonoBehaviour
 	public float[] Weights { get; set; }
 
 	public MeshFilter MeshFilterDisplay;
-
 	public MeshCollider MeshCollider;
-
 	public Bounds Bounds;
 
-	private void Start() {
-		Weights = NoiseGenerator.instance.Run(transform.position);
+	MeshGenerator _meshGenerator;
+
+	public void Initialize(MeshGenerator meshGenerator, NoiseGenerator noiseGenerator) {
+		_meshGenerator = meshGenerator;
+
+		Weights = noiseGenerator.Run(transform.position);
 
 		MeshCollider.sharedMesh = new Mesh();
 	}
 
+
 	private void Update() {
-		MeshGenerator.instance.RequestMeshData(OnReceiveMeshData, Weights);
+		_meshGenerator.RequestMeshData(OnReceiveMeshData, Weights);
 		this.enabled = false;
 	}
 
 	public void EditWeights(Vector3 globalOrigin, float brushSize) {
-		WeightsUpdater.instance.UpdateChunkAt(this, globalOrigin, brushSize);
+		ChunkWeightUpdater.instance.UpdateChunkAt(this, globalOrigin, brushSize);
 		RequestUpdate();
 	}
 

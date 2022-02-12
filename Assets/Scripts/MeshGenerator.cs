@@ -18,7 +18,7 @@ public class MeshGenerator : MonoBehaviour
 
 	public static MeshGenerator instance;
 
-	public const int ChunkSize = 48;
+	public const int ChunkSize = 40;
 
 	Queue<ThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<ThreadInfo<MeshData>>();
 

@@ -24,7 +24,7 @@ public class MeshGenerator : MonoBehaviour
 	}
 
 	private void OnDestroy() {
-		DisposeBuffers();
+		ReleaseBuffers();
 	}
 
 	struct Triangle {
@@ -36,8 +36,6 @@ public class MeshGenerator : MonoBehaviour
 	}
 
 	public void RequestMeshData(Action<MeshData> callback, float[] weights) {
-		CreateBuffers();
-
 		Shader.SetBuffer(0, "triangles", _trianglesBuffer);
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
 
@@ -102,21 +100,9 @@ public class MeshGenerator : MonoBehaviour
 	}
 
 	void CreateBuffers() {
-		if (_trianglesBuffer != null) {
-			_trianglesBuffer.Release();
-			_trianglesCountBuffer.Release();
-			_weightsBuffer.Release();
-		}
-
 		_trianglesBuffer = new ComputeBuffer(5 * (ChunkSize * ChunkSize * ChunkSize), Triangle.SizeOf, ComputeBufferType.Append);
 		_trianglesCountBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
 		_weightsBuffer = new ComputeBuffer(ChunkSize * ChunkSize * ChunkSize, sizeof(float));
-	}
-
-	void DisposeBuffers() {
-		_trianglesBuffer.Dispose();
-		_trianglesCountBuffer.Dispose();
-		_weightsBuffer.Dispose();
 	}
 
 	void ReleaseBuffers() {

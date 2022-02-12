@@ -20,6 +20,7 @@ public class ChunkManager : MonoBehaviour
 
 		_chunkDictionary = new Dictionary<Vector3Int, Chunk>();
 		_currentlyEnabledChunks = new List<Chunk>();
+
 	}
 
 	private void Start() {

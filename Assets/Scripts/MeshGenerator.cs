@@ -8,8 +8,8 @@ public class MeshGenerator : MonoBehaviour
 {
 	public ComputeShader Shader;
 
-	// Multithreading mesh data might have a bug, not sure if this is because of Unity or because of me
-	[Tooltip("NOT RECOMMENDED, MIGHT BE BUGGY")]
+	// Multi-threading mesh data does not really add much speed
+	[Tooltip("Unity's support for multi-threading is limited")]
 	public bool useMultithreading; 
 
 	ComputeBuffer _trianglesBuffer;

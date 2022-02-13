@@ -4,7 +4,7 @@ static const uint numThreads = 8;
 
 RWStructuredBuffer<float> weights;
 
-int numPointsPerAxis;
+int chunkSize;
 
 float3 hitPosition;
 float3 myPosition;
@@ -13,7 +13,7 @@ float brushSize;
 
 int indexFromCoord(int x, int y, int z)
 {
-    return x + numPointsPerAxis * (y + numPointsPerAxis * z);
+    return x + chunkSize * (y + chunkSize * z);
 }
 
 [numthreads(numThreads, numThreads, numThreads)]

@@ -20,9 +20,12 @@ public class Chunk : MonoBehaviour
 		MeshCollider.sharedMesh = new Mesh();
 	}
 
+	public void RequestUpdate() {
+		this.enabled = true;
+	}
 
 	private void Update() {
-		_meshGenerator.RequestMeshData(OnReceiveMeshData, Weights);
+		UpdateMesh(_meshGenerator.RequestMeshData(Weights));
 		this.enabled = false;
 	}
 
@@ -31,28 +34,23 @@ public class Chunk : MonoBehaviour
 		RequestUpdate();
 	}
 
-	public void RequestUpdate() {
-		this.enabled = true;
-	}
-
-	void OnReceiveMeshData(MeshData meshData) {
+	void UpdateMesh(MeshData meshData) {
 		Mesh mesh = MeshCollider.sharedMesh;
 		mesh.Clear();
 		mesh.vertices = meshData.vertices;
 		mesh.triangles = meshData.triangles;
 		mesh.RecalculateNormals();
 
-		MeshCollider.sharedMesh = mesh;
 		Display(mesh);
 	}
 
 	void Display(Mesh mesh) {
 		MeshFilterDisplay.sharedMesh = mesh;
+		MeshCollider.sharedMesh = mesh;
 	}
 
 	private void OnDrawGizmos() {
 		Gizmos.color = Color.green;
-
 		Gizmos.DrawWireCube(Bounds.center, Bounds.size);
 	}
 }

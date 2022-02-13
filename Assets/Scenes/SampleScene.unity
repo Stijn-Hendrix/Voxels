@@ -302,6 +302,7 @@ MonoBehaviour:
   speed: 5
   jumpHeight: 1
   gravity: -9.81
+  useDoubleJump: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,7 +585,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Shader: {fileID: 7200000, guid: 78e4d27ac32c8a7469d8609fca73912e, type: 3}
-  useMultithreading: 0
 --- !u!114 &998498870
 MonoBehaviour:
   m_ObjectHideFlags: 0

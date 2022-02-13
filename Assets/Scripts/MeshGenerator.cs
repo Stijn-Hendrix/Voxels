@@ -1,24 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
-using System.Threading;
 
 public class MeshGenerator : MonoBehaviour
 {
 	public ComputeShader Shader;
-
-	// Multi-threading mesh data does not really add much speed
-	[Tooltip("Unity's support for multi-threading is limited")]
-	public bool useMultithreading; 
 
 	ComputeBuffer _trianglesBuffer;
 	ComputeBuffer _trianglesCountBuffer;
 	ComputeBuffer _weightsBuffer;
 
 	public const int ChunkSize = 40;
-
-	Queue<ThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<ThreadInfo<MeshData>>();
 
 	private void Awake() {
 		CreateBuffers();
@@ -36,11 +28,11 @@ public class MeshGenerator : MonoBehaviour
 		public static int SizeOf => sizeof(float) * 3 * 3;
 	}
 
-	public void RequestMeshData(Action<MeshData> callback, float[] weights) {
+	public MeshData RequestMeshData(float[] weights) {
 		Shader.SetBuffer(0, "triangles", _trianglesBuffer);
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
 
-		Shader.SetInt("numPointsPerAxis", ChunkSize);
+		Shader.SetInt("chunkSize", ChunkSize);
 		Shader.SetFloat("isoLevel", .5f);
 
 		_weightsBuffer.SetData(weights);
@@ -51,31 +43,7 @@ public class MeshGenerator : MonoBehaviour
 		Triangle[] triangles = new Triangle[ReadTriangleCount()];
 		_trianglesBuffer.GetData(triangles);
 
-		if (!useMultithreading) {
-			callback(CreateMesh(triangles));
-		}
-		else {
-			ThreadStart threadStart = delegate {
-				MeshDataThread(callback, triangles);
-			};
-			new Thread(threadStart).Start();
-		}
-	}
-
-	void MeshDataThread(Action<MeshData> callback, Triangle[] triangles) {
-		MeshData data = CreateMesh(triangles);
-		lock (meshDataThreadInfoQueue) {
-			meshDataThreadInfoQueue.Enqueue(new ThreadInfo<MeshData>(callback, data));
-		}
-	}
-
-	private void Update() {
-		if (meshDataThreadInfoQueue.Count > 0) {
-			for (int i = 0; i < meshDataThreadInfoQueue.Count; i++) {
-				ThreadInfo<MeshData> info = meshDataThreadInfoQueue.Dequeue();
-				info.callback(info.parameter);
-			}
-		}
+		return CreateMeshData(triangles);
 	}
 
 	// Read triangles count from the buffer
@@ -86,7 +54,7 @@ public class MeshGenerator : MonoBehaviour
 		return triCount[0];
 	}
 
-	MeshData CreateMesh(Triangle[] triangles) {
+	MeshData CreateMeshData(Triangle[] triangles) {
 		Vector3[] verts = new Vector3[triangles.Length * 3];
 		int[] tris = new int[triangles.Length * 3];
 

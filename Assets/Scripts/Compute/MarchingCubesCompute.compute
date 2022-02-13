@@ -7,7 +7,7 @@ static const uint numThreads = 8;
 RWStructuredBuffer<float> weights;
 
 float isoLevel;
-int numPointsPerAxis;
+int chunkSize;
 
 struct Triangle {
     float3 a, b, c;
@@ -17,7 +17,7 @@ AppendStructuredBuffer<Triangle> triangles;
 
 int indexFromCoord(int x, int y, int z)
 {
-    return x + numPointsPerAxis * (y + numPointsPerAxis * z);
+    return x + chunkSize * (y + chunkSize * z);
 }
 
 float3 interp(float3 p1, float w1, float3 p2, float w2)
@@ -28,7 +28,7 @@ float3 interp(float3 p1, float w1, float3 p2, float w2)
 [numthreads(numThreads, numThreads, numThreads)]
 void March (uint3 id : SV_DispatchThreadID)
 {
-    if (id.x >= numPointsPerAxis - 1 || id.y >= numPointsPerAxis - 1 || id.z >= numPointsPerAxis - 1)
+    if (id.x >= chunkSize - 1 || id.y >= chunkSize - 1 || id.z >= chunkSize - 1)
     {
         return;
     }

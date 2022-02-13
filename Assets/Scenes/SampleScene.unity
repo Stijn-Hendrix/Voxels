@@ -540,7 +540,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab273cbcb72582841974bba3477a151d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewDistance: 8
+  horizontalViewDistance: 5
+  verticalViewDistance: 2
   chunkPrefab: {fileID: 1256522958114542827, guid: 4d3c169f812c5044c83ecc9ffb0d37dd,
     type: 3}
   MeshGenerator: {fileID: 998498869}

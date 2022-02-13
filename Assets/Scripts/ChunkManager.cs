@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class ChunkManager : MonoBehaviour
 {
-	[SerializeField] int viewDistance;
+	[SerializeField] int horizontalViewDistance;
+	[SerializeField] int verticalViewDistance;
 
 	[Header("References")]
     [SerializeField] Chunk chunkPrefab;
@@ -15,21 +16,23 @@ public class ChunkManager : MonoBehaviour
 	Dictionary<Vector3Int, Chunk> _chunkDictionary = new Dictionary<Vector3Int, Chunk>();
 
 	private void Start() {
-		for (int x = -viewDistance; x < viewDistance; x++) {
-			for (int z = -viewDistance; z < viewDistance; z++) {
+		for (int x = -horizontalViewDistance; x < horizontalViewDistance; x++) {
+			for (int y = -verticalViewDistance; y < verticalViewDistance; y++) {
+				for (int z = -horizontalViewDistance; z < horizontalViewDistance; z++) {
 
-				Vector3 chunkPos = new Vector3(x * (MeshGenerator.ChunkSize - 1), 0, z * (MeshGenerator.ChunkSize - 1));
+					Vector3 chunkPos = new Vector3(x * (MeshGenerator.ChunkSize - 1), y * (MeshGenerator.ChunkSize - 1), z * (MeshGenerator.ChunkSize - 1));
 
-				Chunk chunk = Instantiate(chunkPrefab, chunkPos, Quaternion.identity, transform);
-				chunk.Initialize(MeshGenerator, NoiseGenerator);
+					Chunk chunk = Instantiate(chunkPrefab, chunkPos, Quaternion.identity, transform);
+					chunk.Initialize(MeshGenerator, NoiseGenerator);
 
-				Vector3 boundsCenterPos = chunkPos + (Vector3.one * ((MeshGenerator.ChunkSize - 1) / 2));
+					Vector3 boundsCenterPos = chunkPos + (Vector3.one * ((MeshGenerator.ChunkSize - 1) / 2));
 
-				chunk.Bounds = new Bounds(boundsCenterPos, Vector3.one * (MeshGenerator.ChunkSize - 1));
-				chunk.name = $"{ToChunkPosition(chunkPos).ToString()}";
+					chunk.Bounds = new Bounds(boundsCenterPos, Vector3.one * (MeshGenerator.ChunkSize - 1));
+					chunk.name = $"{ToChunkPosition(chunkPos).ToString()}";
 
-				_chunkDictionary.Add(ToChunkPosition(chunkPos), chunk);
-				_currentlyEnabledChunks.Add(chunk);
+					_chunkDictionary.Add(ToChunkPosition(chunkPos), chunk);
+					_currentlyEnabledChunks.Add(chunk);
+				}
 			}
 		}
 	}
@@ -49,7 +52,7 @@ public class ChunkManager : MonoBehaviour
 	Vector3Int ToChunkPosition(Vector3 globalOrigin) {
 		return new Vector3Int(
 					Mathf.FloorToInt((globalOrigin.x) / (MeshGenerator.ChunkSize - 1)),
-					0,
+					Mathf.FloorToInt((globalOrigin.y) / (MeshGenerator.ChunkSize - 1)),
 					Mathf.FloorToInt((globalOrigin.z) / (MeshGenerator.ChunkSize - 1))
 				);
 	}

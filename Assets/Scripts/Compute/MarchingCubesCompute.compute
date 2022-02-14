@@ -68,9 +68,9 @@ void March (uint3 id : SV_DispatchThreadID)
         int e21 = edgeConnections[edges[i + 2]][1];
 
         Triangle tri;
-        tri.a = interp(corners[e00] + id, cubeValues[e00], corners[e01] + id, cubeValues[e01]);
-        tri.b = interp(corners[e10] + id, cubeValues[e10], corners[e11] + id, cubeValues[e11]);
-        tri.c = interp(corners[e20] + id, cubeValues[e20], corners[e21] + id, cubeValues[e21]);
+        tri.a = interp(cornerOffsets[e00] + id, cubeValues[e00], cornerOffsets[e01] + id, cubeValues[e01]);
+        tri.b = interp(cornerOffsets[e10] + id, cubeValues[e10], cornerOffsets[e11] + id, cubeValues[e11]);
+        tri.c = interp(cornerOffsets[e20] + id, cubeValues[e20], cornerOffsets[e21] + id, cubeValues[e21]);
         triangles.Append(tri);
     }
 }

@@ -10,7 +10,7 @@ public class MeshGenerator : MonoBehaviour
 	ComputeBuffer _trianglesCountBuffer;
 	ComputeBuffer _weightsBuffer;
 
-	public const int ChunkSize = 40;
+	public const int ChunkSize = 16;
 
 	private void Awake() {
 		CreateBuffers();

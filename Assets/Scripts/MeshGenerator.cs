@@ -28,7 +28,7 @@ public class MeshGenerator : MonoBehaviour
 		public static int SizeOf => sizeof(float) * 3 * 3;
 	}
 
-	public MeshData RequestMeshData(float[] weights) {
+	public Mesh RequestMeshData(float[] weights, Chunk from) {
 		Shader.SetBuffer(0, "triangles", _trianglesBuffer);
 		Shader.SetBuffer(0, "weights", _weightsBuffer);
 
@@ -43,7 +43,7 @@ public class MeshGenerator : MonoBehaviour
 		Triangle[] triangles = new Triangle[ReadTriangleCount()];
 		_trianglesBuffer.GetData(triangles);
 
-		return CreateMeshData(triangles);
+		return CreateMesh(triangles, from);
 	}
 
 	// Read triangles count from the buffer
@@ -54,7 +54,7 @@ public class MeshGenerator : MonoBehaviour
 		return triCount[0];
 	}
 
-	MeshData CreateMeshData(Triangle[] triangles) {
+	Mesh CreateMesh(Triangle[] triangles, Chunk from) {
 		Vector3[] verts = new Vector3[triangles.Length * 3];
 		int[] tris = new int[triangles.Length * 3];
 
@@ -69,7 +69,13 @@ public class MeshGenerator : MonoBehaviour
 			tris[startIndex + 1] = startIndex + 1;
 			tris[startIndex + 2] = startIndex + 2;
 		}
-		return new MeshData(tris, verts);
+
+		Mesh mesh = from.MeshCollider.sharedMesh;
+		mesh.Clear();
+		mesh.vertices = verts;
+		mesh.triangles = tris;
+		mesh.RecalculateNormals();
+		return mesh;
 	}
 
 	void CreateBuffers() {
@@ -82,15 +88,5 @@ public class MeshGenerator : MonoBehaviour
 		_trianglesBuffer.Release();
 		_trianglesCountBuffer.Release();
 		_weightsBuffer.Release();
-	}
-}
-
-public struct MeshData {
-	public int[] triangles;
-	public Vector3[] vertices;
-
-	public MeshData(int[] triangles, Vector3[] vertices) {
-		this.triangles = triangles;
-		this.vertices = vertices;
 	}
 }

@@ -25,7 +25,7 @@ public class Chunk : MonoBehaviour
 	}
 
 	private void Update() {
-		UpdateMesh(_meshGenerator.RequestMeshData(Weights));
+		UpdateMesh(_meshGenerator.RequestMeshData(Weights, this));
 		this.enabled = false;
 	}
 
@@ -34,13 +34,7 @@ public class Chunk : MonoBehaviour
 		RequestUpdate();
 	}
 
-	void UpdateMesh(MeshData meshData) {
-		Mesh mesh = MeshCollider.sharedMesh;
-		mesh.Clear();
-		mesh.vertices = meshData.vertices;
-		mesh.triangles = meshData.triangles;
-		mesh.RecalculateNormals();
-
+	void UpdateMesh(Mesh mesh) {
 		Display(mesh);
 	}
 

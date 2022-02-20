@@ -15,30 +15,19 @@ public class Chunk : MonoBehaviour
 	public void Initialize(MeshGenerator meshGenerator, NoiseGenerator noiseGenerator) {
 		_meshGenerator = meshGenerator;
 
-		Weights = noiseGenerator.Run(transform.position);
+		Weights = noiseGenerator.GetNoise(transform.position);
 
 		MeshCollider.sharedMesh = new Mesh();
-	}
 
-	public void RequestUpdate() {
-		this.enabled = true;
-	}
-
-	private void Update() {
-		UpdateMesh(_meshGenerator.RequestMeshData(Weights, this));
-		this.enabled = false;
+		UpdateMesh(_meshGenerator.GetMeshData(Weights, this));
 	}
 
 	public void EditWeights(Vector3 globalOrigin, float brushSize) {
 		ChunkWeightUpdater.instance.UpdateChunkAt(this, globalOrigin, brushSize);
-		RequestUpdate();
+		UpdateMesh(_meshGenerator.GetMeshData(Weights, this));
 	}
 
 	void UpdateMesh(Mesh mesh) {
-		Display(mesh);
-	}
-
-	void Display(Mesh mesh) {
 		MeshFilterDisplay.sharedMesh = mesh;
 		MeshCollider.sharedMesh = mesh;
 	}

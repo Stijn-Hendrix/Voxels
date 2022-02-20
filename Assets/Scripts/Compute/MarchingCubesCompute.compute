@@ -4,50 +4,50 @@
 
 static const uint numThreads = 8;
 
-RWStructuredBuffer<float> weights;
+RWStructuredBuffer<float> _Weights;
 
-float isoLevel;
-int chunkSize;
+float _IsoLevel;
+int _ChunkSize;
 
 struct Triangle {
     float3 a, b, c;
 };
 
-AppendStructuredBuffer<Triangle> triangles;
+AppendStructuredBuffer<Triangle> _Triangles;
 
 int indexFromCoord(int x, int y, int z)
 {
-    return x + chunkSize * (y + chunkSize * z);
+    return x + _ChunkSize * (y + _ChunkSize * z);
 }
 
 float3 interp(float3 p1, float w1, float3 p2, float w2)
 {
-    return (p1 + (isoLevel - w1) * (p2 - p1)  / (w2 - w1));
+    return (p1 + (_IsoLevel - w1) * (p2 - p1)  / (w2 - w1));
 }
 
 [numthreads(numThreads, numThreads, numThreads)]
 void March (uint3 id : SV_DispatchThreadID)
 {
-    if (id.x >= chunkSize - 1 || id.y >= chunkSize - 1 || id.z >= chunkSize - 1)
+    if (id.x >= _ChunkSize - 1 || id.y >= _ChunkSize - 1 || id.z >= _ChunkSize - 1)
     {
         return;
     }
 
     float cubeValues[8] = {
-       weights[indexFromCoord(id.x, id.y, id.z + 1)],
-       weights[indexFromCoord(id.x + 1, id.y, id.z + 1)],
-       weights[indexFromCoord(id.x + 1, id.y, id.z)],
-       weights[indexFromCoord(id.x, id.y, id.z)],
-       weights[indexFromCoord(id.x, id.y + 1, id.z + 1)],
-       weights[indexFromCoord(id.x + 1, id.y + 1, id.z + 1)],
-       weights[indexFromCoord(id.x + 1, id.y + 1, id.z)],
-       weights[indexFromCoord(id.x, id.y + 1, id.z)]
+       _Weights[indexFromCoord(id.x, id.y, id.z + 1)],
+       _Weights[indexFromCoord(id.x + 1, id.y, id.z + 1)],
+       _Weights[indexFromCoord(id.x + 1, id.y, id.z)],
+       _Weights[indexFromCoord(id.x, id.y, id.z)],
+       _Weights[indexFromCoord(id.x, id.y + 1, id.z + 1)],
+       _Weights[indexFromCoord(id.x + 1, id.y + 1, id.z + 1)],
+       _Weights[indexFromCoord(id.x + 1, id.y + 1, id.z)],
+       _Weights[indexFromCoord(id.x, id.y + 1, id.z)]
     };
 
     int cubeIndex = 0;
     for (int j = 0; j < 8; j++)
     {
-        if (cubeValues[j] < isoLevel)
+        if (cubeValues[j] < _IsoLevel)
         {
             cubeIndex |= 1 << j;
         }
@@ -71,6 +71,6 @@ void March (uint3 id : SV_DispatchThreadID)
         tri.a = interp(cornerOffsets[e00] + id, cubeValues[e00], cornerOffsets[e01] + id, cubeValues[e01]);
         tri.b = interp(cornerOffsets[e10] + id, cubeValues[e10], cornerOffsets[e11] + id, cubeValues[e11]);
         tri.c = interp(cornerOffsets[e20] + id, cubeValues[e20], cornerOffsets[e21] + id, cubeValues[e21]);
-        triangles.Append(tri);
+        _Triangles.Append(tri);
     }
 }

@@ -2,27 +2,25 @@
 
 static const uint numThreads = 8;
 
-RWStructuredBuffer<float> weights;
+RWStructuredBuffer<float> _Weights;
 
-int chunkSize;
-
-float3 hitPosition;
-float3 myPosition;
-
-float brushSize;
+int _ChunkSize;
+float3 _HitPosition;
+float3 _MyPosition;
+float _BrushSize;
 
 int indexFromCoord(int x, int y, int z)
 {
-    return x + chunkSize * (y + chunkSize * z);
+    return x + _ChunkSize * (y + _ChunkSize * z);
 }
 
 [numthreads(numThreads, numThreads, numThreads)]
 void UpdateWeights (uint3 id : SV_DispatchThreadID)
 {
-    float3 pos = myPosition + id;
+    float3 pos = _MyPosition + id;
 
-    if (distance(pos, hitPosition) <= brushSize)
+    if (distance(pos, _HitPosition) <= _BrushSize)
     {
-        weights[indexFromCoord(id.x, id.y, id.z)] += 1;
+        _Weights[indexFromCoord(id.x, id.y, id.z)] += 1;
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MeshGenerator : MonoBehaviour
 {
@@ -28,12 +26,12 @@ public class MeshGenerator : MonoBehaviour
 		public static int SizeOf => sizeof(float) * 3 * 3;
 	}
 
-	public Mesh RequestMeshData(float[] weights, Chunk from) {
-		Shader.SetBuffer(0, "triangles", _trianglesBuffer);
-		Shader.SetBuffer(0, "weights", _weightsBuffer);
+	public Mesh GetMeshData(float[] weights, Chunk from) {
+		Shader.SetBuffer(0, "_Triangles", _trianglesBuffer);
+		Shader.SetBuffer(0, "_Weights", _weightsBuffer);
 
-		Shader.SetInt("chunkSize", ChunkSize);
-		Shader.SetFloat("isoLevel", .5f);
+		Shader.SetInt("_ChunkSize", ChunkSize);
+		Shader.SetFloat("_IsoLevel", .5f);
 
 		_weightsBuffer.SetData(weights);
 		_trianglesBuffer.SetCounterValue(0);

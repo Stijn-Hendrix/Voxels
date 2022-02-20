@@ -4,18 +4,16 @@
 
 static const uint numThreads = 8;
 
-RWStructuredBuffer<float> weights;
+RWStructuredBuffer<float> _Weights;
 
-int chunkSize;
-
-float3 position;
-
-float noiseScale;
-float amplitude;
+int _ChunkSize;
+float3 _Position;
+float _NoiseScale;
+float _Amplitude;
 
 int indexFromCoord(int x, int y, int z)
 {
-    return x + chunkSize * (y + chunkSize * z);
+    return x + _ChunkSize * (y + _ChunkSize * z);
 }
 
 [numthreads(numThreads, numThreads, numThreads)]
@@ -27,11 +25,9 @@ void GenerateNoise(uint3 id : SV_DispatchThreadID)
     noise.frequency = 0.004;
     noise.octaves = 6;
 
-    float3 pos = id + position;
+    float3 pos = id + _Position;
+    float ground = -pos.y + (0.2 * _ChunkSize);
+    float n = ground + fnlGetNoise3D(noise, pos.x, pos.y, pos.z) * _NoiseScale * _Amplitude;
 
-    float ground = -pos.y + (0.2 * chunkSize);
-    
-    float n = ground + fnlGetNoise3D(noise, pos.x, pos.y, pos.z) * noiseScale * amplitude;
-
-    weights[indexFromCoord(id.x, id.y, id.z)] = n;
+    _Weights[indexFromCoord(id.x, id.y, id.z)] = n;
 }

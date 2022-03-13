@@ -10,6 +10,9 @@ int _ChunkSize;
 float3 _Position;
 float _NoiseScale;
 float _Amplitude;
+float _Frequency;
+int _Octaves;
+float _GroundPercent;
 
 int indexFromCoord(int x, int y, int z)
 {
@@ -21,13 +24,25 @@ void GenerateNoise(uint3 id : SV_DispatchThreadID)
 {
     fnl_state noise = fnlCreateState();
     noise.noise_type = FNL_NOISE_OPENSIMPLEX2;
-    noise.fractal_type = FNL_FRACTAL_RIDGED;
-    noise.frequency = 0.004;
-    noise.octaves = 6;
+    //noise.fractal_type = FNL_FRACTAL_RIDGED;
+    noise.fractal_type = FNL_FRACTAL_FBM;
+    noise.frequency = _Frequency;
 
-    float3 pos = id + _Position;
-    float ground = -pos.y + (0.2 * _ChunkSize);
-    float n = ground + fnlGetNoise3D(noise, pos.x, pos.y, pos.z) * _NoiseScale * _Amplitude;
+    fnl_state r = fnlCreateState();
+    r.noise_type = FNL_NOISE_OPENSIMPLEX2;
+    r.fractal_type = FNL_FRACTAL_RIDGED;
+    r.frequency = _Frequency + 0.005;
+    r.octaves = _Octaves;
 
-    _Weights[indexFromCoord(id.x, id.y, id.z)] = n;
+    float radius = 160;
+
+    float3 pos = (id + _Position) * _NoiseScale;
+
+    float ground = -pos.y + (_GroundPercent * _ChunkSize);
+    float n = ground + fnlGetNoise3D(noise, pos.x, pos.y, pos.z) * _Amplitude;
+
+    float ns = fnlGetNoise3D(noise, pos.x, pos.y, pos.z) + fnlGetNoise3D(r, pos.x, pos.y, pos.z);
+
+    //_Weights[indexFromCoord(id.x, id.y, id.z)] = radius - length(pos) + fnlGetNoise3D(noise, pos.x, pos.y, pos.z) * _Amplitude;
+    _Weights[indexFromCoord(id.x, id.y, id.z)] = radius - length(pos) + ns * _Amplitude;
 }

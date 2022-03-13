@@ -294,7 +294,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 641490975}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 54a4eaaf094b962448233642e2f0c91d, type: 3}
   m_Name: 
@@ -448,8 +448,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab273cbcb72582841974bba3477a151d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalViewDistance: 10
-  verticalViewDistance: 4
+  horizontalViewDistance: 6
+  verticalViewDistance: 6
   chunkPrefab: {fileID: 1256522958114542827, guid: 4d3c169f812c5044c83ecc9ffb0d37dd,
     type: 3}
   MeshGenerator: {fileID: 998498869}
@@ -481,6 +481,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Shader: {fileID: 7200000, guid: e22b63200c5f0ad4c844c64d562813da, type: 3}
+  noiseScale: 1
+  amplitude: 5
+  frequency: 0.005
+  octaves: 8
+  groundPercent: 0.2
 --- !u!114 &998498869
 MonoBehaviour:
   m_ObjectHideFlags: 0

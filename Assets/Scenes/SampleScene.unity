@@ -480,7 +480,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fa08f28f4d15f9408f0858eb209e710, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Shader: {fileID: 7200000, guid: e22b63200c5f0ad4c844c64d562813da, type: 3}
+  FlatTerrainShader: {fileID: 7200000, guid: c0650f20bcfa4cf47b7ce9a6b92363a9, type: 3}
+  SphericalTerrainShader: {fileID: 7200000, guid: e22b63200c5f0ad4c844c64d562813da,
+    type: 3}
+  noiseType: 0
   noiseScale: 1
   amplitude: 5
   frequency: 0.005

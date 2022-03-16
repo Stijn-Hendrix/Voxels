@@ -2,9 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum NoiseType {
+	FLAT,
+	SPHERICAL
+}
+
 public class NoiseGenerator : MonoBehaviour
 {
-	public ComputeShader Shader;
+	[Header("Shaders")]
+	public ComputeShader FlatTerrainShader;
+	public ComputeShader SphericalTerrainShader;
+
+	public NoiseType noiseType;
+
+	ComputeShader Shader;
+
+	[Header("Noise Parameters")]
 
 	[SerializeField] float noiseScale = 0.08f;
 	[SerializeField] float amplitude = 200;
@@ -15,6 +28,15 @@ public class NoiseGenerator : MonoBehaviour
 	ComputeBuffer _weightsBuffer;
 
 	private void Awake() {
+		switch (noiseType) {
+			case NoiseType.FLAT:
+				Shader = FlatTerrainShader;
+				break;
+			case NoiseType.SPHERICAL:
+				Shader = SphericalTerrainShader;
+				break;
+		}
+
 		CreateBuffers();
 	}
 

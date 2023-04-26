@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class ChunkManager : MonoBehaviour
 {
-	[SerializeField] int horizontalViewDistance;
-	[SerializeField] int verticalViewDistance;
+    [Range(2, 20)]
+    [SerializeField] int renderDistance;
+
+    [SerializeField] Transform player;
 
 	[Header("References")]
     [SerializeField] Chunk chunkPrefab;
@@ -13,29 +15,90 @@ public class ChunkManager : MonoBehaviour
 	[SerializeField] NoiseGenerator NoiseGenerator;
 
 	List<Chunk> _currentlyEnabledChunks = new List<Chunk>();
-	Dictionary<Vector3Int, Chunk> _chunkDictionary = new Dictionary<Vector3Int, Chunk>();
 
-	private void Start() {
-		for (int x = -horizontalViewDistance; x < horizontalViewDistance; x++) {
-			for (int y = -verticalViewDistance; y < verticalViewDistance; y++) {
-				for (int z = -horizontalViewDistance; z < horizontalViewDistance; z++) {
+    Dictionary<Vector3Int, Chunk> _chunkDictionary = new Dictionary<Vector3Int, Chunk>();
+    PriorityQueue<Vector3Int> _buildQueue = new PriorityQueue<Vector3Int>();
 
-					Vector3 chunkPos = new Vector3(x * (MeshGenerator.ChunkSize - 1), y * (MeshGenerator.ChunkSize - 1), z * (MeshGenerator.ChunkSize - 1));
 
-					Chunk chunk = Instantiate(chunkPrefab, chunkPos, Quaternion.identity, transform);
-					chunk.Initialize(MeshGenerator, NoiseGenerator);
+	private void Start()
+	{
+        UpdateChunks();
 
-					Vector3 boundsCenterPos = chunkPos + (Vector3.one * ((MeshGenerator.ChunkSize - 1) / 2));
+        int count = _buildQueue.Count;
+        for (int i = 0; i < count; i++)
+        {
+            var chunkPos = _buildQueue.Dequeue();
+            CreateChunk(chunkPos);
+        }
+    }
 
-					chunk.Bounds = new Bounds(boundsCenterPos, Vector3.one * (MeshGenerator.ChunkSize - 1));
-					chunk.name = $"{ToChunkPosition(chunkPos).ToString()}";
+    private void Update()
+    {
+        UpdateChunks();
 
-					_chunkDictionary.Add(ToChunkPosition(chunkPos), chunk);
-					_currentlyEnabledChunks.Add(chunk);
-				}
-			}
-		}
-	}
+        int count = Mathf.Min(5, _buildQueue.Count);
+        for (int i = 0; i < count; i++)
+        {
+            var chunkPos = _buildQueue.Dequeue();
+            CreateChunk(chunkPos);
+        }
+    }
+
+	void UpdateChunks()
+	{
+        Vector3 playerPos = player.transform.position;
+        Vector3Int relPos = ToChunkPosition(playerPos);
+
+        foreach (var keypair in _chunkDictionary)
+        {
+            Chunk chunk = keypair.Value;
+            if (chunk != null)
+            {
+                if (!InRenderDistance(ToChunkPosition(chunk.transform.position), relPos, renderDistance))
+                {
+
+                    chunk.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        for (int x = -renderDistance + relPos.x; x < renderDistance + relPos.x; x++)
+        {
+            for (int y = -renderDistance + relPos.y; y < renderDistance + relPos.y; y++)
+            {
+                for (int z = -renderDistance + relPos.z; z < renderDistance + relPos.z; z++)
+                {
+                    Vector3Int chunkPos = 
+                        new Vector3Int(x * (MeshGenerator.ChunkSize - 1), y * (MeshGenerator.ChunkSize - 1), z * (MeshGenerator.ChunkSize - 1));
+
+                    if (!_chunkDictionary.ContainsKey(chunkPos))
+                    {
+                        _buildQueue.Enqueue(chunkPos, ManhattanDistance(Vector3Int.FloorToInt(player.transform.position), chunkPos));
+                        _chunkDictionary.Add(chunkPos, null);
+                    }
+                    else
+                    {
+                        if (_chunkDictionary[chunkPos] != null) _chunkDictionary[chunkPos].gameObject.SetActive(true);
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void CreateChunk(Vector3Int chunkPos)
+    {
+        Chunk chunk = Instantiate(chunkPrefab, chunkPos, Quaternion.identity, transform);
+        chunk.Initialize(MeshGenerator, NoiseGenerator);
+
+        Vector3 boundsCenterPos = chunkPos + (Vector3.one * ((MeshGenerator.ChunkSize - 1) / 2));
+
+        chunk.Bounds = new Bounds(boundsCenterPos, Vector3.one * (MeshGenerator.ChunkSize - 1));
+        chunk.name = $"{ToChunkPosition(chunkPos).ToString()}";
+
+        _chunkDictionary[chunkPos] = chunk;
+        _currentlyEnabledChunks.Add(chunk);
+    }
 
 	public void EditWeights(Vector3 globalPosition, float brushSize) {
 		// Add 5 to make sure you check a slightly larger range than brush size
@@ -49,12 +112,24 @@ public class ChunkManager : MonoBehaviour
 		}
 	}
 
-	Vector3Int ToChunkPosition(Vector3 globalOrigin) {
+	Vector3Int ToChunkPosition(Vector3 globalPosition) {
 		return new Vector3Int(
-					Mathf.FloorToInt((globalOrigin.x) / (MeshGenerator.ChunkSize - 1)),
-					Mathf.FloorToInt((globalOrigin.y) / (MeshGenerator.ChunkSize - 1)),
-					Mathf.FloorToInt((globalOrigin.z) / (MeshGenerator.ChunkSize - 1))
+					Mathf.FloorToInt((globalPosition.x) / (MeshGenerator.ChunkSize - 1)),
+					Mathf.FloorToInt((globalPosition.y) / (MeshGenerator.ChunkSize - 1)),
+					Mathf.FloorToInt((globalPosition.z) / (MeshGenerator.ChunkSize - 1))
 				);
 	}
 
+    bool InRenderDistance(Vector3Int a, Vector3Int b, int chunkRenderingDistance)
+    {
+        return Mathf.Abs(a.x - b.x) <= chunkRenderingDistance && Mathf.Abs(a.y - b.y) <= chunkRenderingDistance && Mathf.Abs(a.z - b.z) <= chunkRenderingDistance;
+    }
+
+    private static int ManhattanDistance(Vector3Int a, Vector3Int b)
+    {
+        checked
+        {
+            return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y) + Mathf.Abs(a.z - b.z);
+        }
+    }
 }

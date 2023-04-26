@@ -9,13 +9,13 @@ public enum NoiseType {
 
 public class NoiseGenerator : MonoBehaviour
 {
-	[Header("Shaders")]
+   
+    [Header("Shaders")]
 	public ComputeShader FlatTerrainShader;
 	public ComputeShader SphericalTerrainShader;
 
-	public NoiseType noiseType;
+	public NoiseType NoiseType;
 
-	ComputeShader Shader;
 
 	[Header("Noise Parameters")]
 
@@ -25,15 +25,17 @@ public class NoiseGenerator : MonoBehaviour
 	[SerializeField] int octaves = 6;
 	[SerializeField, Range(0f,1f)] float groundPercent = 0.2f;
 
+
+    ComputeShader _noiseConstructionCompute;
 	ComputeBuffer _weightsBuffer;
 
 	private void Awake() {
-		switch (noiseType) {
+		switch (NoiseType) {
 			case NoiseType.FLAT:
-				Shader = FlatTerrainShader;
+				_noiseConstructionCompute = FlatTerrainShader;
 				break;
 			case NoiseType.SPHERICAL:
-				Shader = SphericalTerrainShader;
+				_noiseConstructionCompute = SphericalTerrainShader;
 				break;
 		}
 
@@ -47,16 +49,16 @@ public class NoiseGenerator : MonoBehaviour
 	public float[] GetNoise(Vector3 position) {
 		float[] heights = new float[MeshGenerator.ChunkSize * MeshGenerator.ChunkSize * MeshGenerator.ChunkSize];
 
-		Shader.SetBuffer(0, "_Weights", _weightsBuffer);
-		Shader.SetInt("_ChunkSize", MeshGenerator.ChunkSize);
-		Shader.SetVector("_Position", position);
-		Shader.SetFloat("_NoiseScale", noiseScale);
-		Shader.SetFloat("_Amplitude", amplitude);
-		Shader.SetFloat("_Frequency", frequency);
-		Shader.SetInt("_Octaves", octaves);
-		Shader.SetFloat("_GroundPercent", groundPercent);
+		_noiseConstructionCompute.SetBuffer(0, "_Weights", _weightsBuffer);
+		_noiseConstructionCompute.SetInt("_ChunkSize", MeshGenerator.ChunkSize);
+		_noiseConstructionCompute.SetVector("_Position", position);
+		_noiseConstructionCompute.SetFloat("_NoiseScale", noiseScale);
+		_noiseConstructionCompute.SetFloat("_Amplitude", amplitude);
+		_noiseConstructionCompute.SetFloat("_Frequency", frequency);
+		_noiseConstructionCompute.SetInt("_Octaves", octaves);
+		_noiseConstructionCompute.SetFloat("_GroundPercent", groundPercent);
 
-		Shader.Dispatch(0, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8);
+		_noiseConstructionCompute.Dispatch(0, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8);
 
 		_weightsBuffer.GetData(heights);
 

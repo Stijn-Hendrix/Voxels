@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class ChunkManager : MonoBehaviour
 {
-    [Range(2, 20)]
-    [SerializeField] int renderDistance;
-
+    [Header("Rendering")]
+    [Range(1, 20), SerializeField] int renderDistanceHorizontal;
+    [Range(1, 20), SerializeField] int renderDistanceVertical;
+    [Range(1, 10), SerializeField] int maxChunkBuildPerFrame;
     [SerializeField] Transform player;
 
 	[Header("References")]
@@ -36,7 +37,7 @@ public class ChunkManager : MonoBehaviour
     {
         UpdateChunks();
 
-        int count = Mathf.Min(5, _buildQueue.Count);
+        int count = Mathf.Min(maxChunkBuildPerFrame, _buildQueue.Count);
         for (int i = 0; i < count; i++)
         {
             var chunkPos = _buildQueue.Dequeue();
@@ -54,7 +55,7 @@ public class ChunkManager : MonoBehaviour
             Chunk chunk = keypair.Value;
             if (chunk != null)
             {
-                if (!InRenderDistance(ToChunkPosition(chunk.transform.position), relPos, renderDistance))
+                if (!InRenderDistance(ToChunkPosition(chunk.transform.position), relPos, renderDistanceHorizontal, renderDistanceVertical))
                 {
 
                     chunk.gameObject.SetActive(false);
@@ -62,11 +63,11 @@ public class ChunkManager : MonoBehaviour
             }
         }
 
-        for (int x = -renderDistance + relPos.x; x < renderDistance + relPos.x; x++)
+        for (int x = -renderDistanceHorizontal + relPos.x; x < renderDistanceHorizontal + relPos.x; x++)
         {
-            for (int y = -renderDistance + relPos.y; y < renderDistance + relPos.y; y++)
+            for (int y = -renderDistanceVertical + relPos.y; y < renderDistanceVertical + relPos.y; y++)
             {
-                for (int z = -renderDistance + relPos.z; z < renderDistance + relPos.z; z++)
+                for (int z = -renderDistanceHorizontal + relPos.z; z < renderDistanceHorizontal + relPos.z; z++)
                 {
                     Vector3Int chunkPos = 
                         new Vector3Int(x * (MeshGenerator.ChunkSize - 1), y * (MeshGenerator.ChunkSize - 1), z * (MeshGenerator.ChunkSize - 1));
@@ -120,9 +121,9 @@ public class ChunkManager : MonoBehaviour
 				);
 	}
 
-    bool InRenderDistance(Vector3Int a, Vector3Int b, int chunkRenderingDistance)
+    bool InRenderDistance(Vector3Int a, Vector3Int b, int horizontal, int vertical)
     {
-        return Mathf.Abs(a.x - b.x) <= chunkRenderingDistance && Mathf.Abs(a.y - b.y) <= chunkRenderingDistance && Mathf.Abs(a.z - b.z) <= chunkRenderingDistance;
+        return Mathf.Abs(a.x - b.x) <= horizontal && Mathf.Abs(a.y - b.y) <= vertical && Mathf.Abs(a.z - b.z) <= horizontal;
     }
 
     private static int ManhattanDistance(Vector3Int a, Vector3Int b)

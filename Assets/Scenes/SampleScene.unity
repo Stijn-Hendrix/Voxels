@@ -280,7 +280,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 641490975}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 963194228}
@@ -448,7 +448,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab273cbcb72582841974bba3477a151d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderDistance: 6
+  renderDistanceHorizontal: 10
+  renderDistanceVertical: 1
+  maxChunkBuildPerFrame: 2
   player: {fileID: 641490977}
   chunkPrefab: {fileID: 1256522958114542827, guid: 4d3c169f812c5044c83ecc9ffb0d37dd,
     type: 3}
@@ -483,7 +485,7 @@ MonoBehaviour:
   FlatTerrainShader: {fileID: 7200000, guid: c0650f20bcfa4cf47b7ce9a6b92363a9, type: 3}
   SphericalTerrainShader: {fileID: 7200000, guid: e22b63200c5f0ad4c844c64d562813da,
     type: 3}
-  NoiseType: 1
+  NoiseType: 0
   noiseScale: 1
   amplitude: 7
   frequency: 0.005

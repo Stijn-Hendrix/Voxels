@@ -280,7 +280,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 641490975}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalPosition: {x: 0, y: 20, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 963194228}
@@ -415,6 +415,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ChunkManager: {fileID: 998498866}
+  terraformDistance: 2000
   BrushSize: 5
 --- !u!1 &998498865
 GameObject:
@@ -448,8 +449,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab273cbcb72582841974bba3477a151d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderDistanceHorizontal: 10
-  renderDistanceVertical: 1
+  renderDistanceHorizontal: 6
+  renderDistanceVertical: 4
   maxChunkBuildPerFrame: 2
   player: {fileID: 641490977}
   chunkPrefab: {fileID: 1256522958114542827, guid: 4d3c169f812c5044c83ecc9ffb0d37dd,
@@ -486,10 +487,10 @@ MonoBehaviour:
   SphericalTerrainShader: {fileID: 7200000, guid: e22b63200c5f0ad4c844c64d562813da,
     type: 3}
   NoiseType: 0
-  noiseScale: 1
-  amplitude: 7
+  noiseScale: 0.2
+  amplitude: 60
   frequency: 0.005
-  octaves: 5
+  octaves: 7
   groundPercent: 0.2
 --- !u!114 &998498869
 MonoBehaviour:

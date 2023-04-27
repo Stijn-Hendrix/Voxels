@@ -7,6 +7,9 @@ public class Terraforming : MonoBehaviour
 	[SerializeField]
 	ChunkManager ChunkManager;
 
+	[SerializeField]
+	int terraformDistance = 2000;
+
 	Vector3 _hitPoint;
 	Camera _cam;
 
@@ -20,7 +23,7 @@ public class Terraforming : MonoBehaviour
 		if (Input.GetMouseButton(0)) {
 			RaycastHit hit;
 
-			if (Physics.Raycast(_cam.ScreenPointToRay(Input.mousePosition), out hit, 1000)) {
+			if (Physics.Raycast(_cam.ScreenPointToRay(Input.mousePosition), out hit, terraformDistance)) {
 				ChunkManager.EditWeights(hit.point, BrushSize);
 			}
 		}

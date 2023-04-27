@@ -9,35 +9,36 @@ public class ChunkManager : MonoBehaviour
     [Range(1, 20), SerializeField] int renderDistanceVertical;
     [Range(1, 10), SerializeField] int maxChunkBuildPerFrame;
     [SerializeField] Transform player;
+    private Vector3Int _lastPlayerChunk;
 
 	[Header("References")]
     [SerializeField] Chunk chunkPrefab;
 	[SerializeField] MeshGenerator MeshGenerator;
 	[SerializeField] NoiseGenerator NoiseGenerator;
 
-	List<Chunk> _currentlyEnabledChunks = new List<Chunk>();
-
     Dictionary<Vector3Int, Chunk> _chunkDictionary = new Dictionary<Vector3Int, Chunk>();
     PriorityQueue<Vector3Int> _buildQueue = new PriorityQueue<Vector3Int>();
-
+	List<Chunk> _currentlyEnabledChunks = new List<Chunk>();
 
 	private void Start()
 	{
-        UpdateChunks();
+        Vector3 playerPos = player.transform.position;
+        Vector3Int relPos = ToChunkPosition(playerPos);
+        _lastPlayerChunk = relPos + Vector3Int.one; // Set to something different than current player pos for initial chunk creation
 
-        int count = _buildQueue.Count;
-        for (int i = 0; i < count; i++)
-        {
-            var chunkPos = _buildQueue.Dequeue();
-            CreateChunk(chunkPos);
-        }
+        UpdateChunks();
+        ConstructBuildQueue(_buildQueue.Count);
     }
 
     private void Update()
     {
         UpdateChunks();
+        ConstructBuildQueue(maxChunkBuildPerFrame);
+    }
 
-        int count = Mathf.Min(maxChunkBuildPerFrame, _buildQueue.Count);
+    void ConstructBuildQueue(int size)
+    {
+        int count = Mathf.Min(size, _buildQueue.Count);
         for (int i = 0; i < count; i++)
         {
             var chunkPos = _buildQueue.Dequeue();
@@ -50,18 +51,13 @@ public class ChunkManager : MonoBehaviour
         Vector3 playerPos = player.transform.position;
         Vector3Int relPos = ToChunkPosition(playerPos);
 
-        foreach (var keypair in _chunkDictionary)
+        if (_lastPlayerChunk == relPos)
         {
-            Chunk chunk = keypair.Value;
-            if (chunk != null)
-            {
-                if (!InRenderDistance(ToChunkPosition(chunk.transform.position), relPos, renderDistanceHorizontal, renderDistanceVertical))
-                {
-
-                    chunk.gameObject.SetActive(false);
-                }
-            }
+            return;
         }
+
+        _currentlyEnabledChunks.ForEach(chunk => chunk.gameObject.SetActive(false) );
+        _currentlyEnabledChunks.Clear();
 
         for (int x = -renderDistanceHorizontal + relPos.x; x < renderDistanceHorizontal + relPos.x; x++)
         {
@@ -69,36 +65,46 @@ public class ChunkManager : MonoBehaviour
             {
                 for (int z = -renderDistanceHorizontal + relPos.z; z < renderDistanceHorizontal + relPos.z; z++)
                 {
-                    Vector3Int chunkPos = 
+                    Vector3Int chunkglobalPos = 
                         new Vector3Int(x * (MeshGenerator.ChunkSize - 1), y * (MeshGenerator.ChunkSize - 1), z * (MeshGenerator.ChunkSize - 1));
 
-                    if (!_chunkDictionary.ContainsKey(chunkPos))
+                    if (!_chunkDictionary.ContainsKey(chunkglobalPos))
                     {
-                        _buildQueue.Enqueue(chunkPos, ManhattanDistance(Vector3Int.FloorToInt(player.transform.position), chunkPos));
-                        _chunkDictionary.Add(chunkPos, null);
+                        _buildQueue.Enqueue(chunkglobalPos, ManhattanDistance(Vector3Int.FloorToInt(player.transform.position), chunkglobalPos));
+                        _chunkDictionary.Add(chunkglobalPos, null);
                     }
                     else
                     {
-                        if (_chunkDictionary[chunkPos] != null) _chunkDictionary[chunkPos].gameObject.SetActive(true);
+                        Chunk chunk = _chunkDictionary[chunkglobalPos];
+                        if (chunk != null)
+                        {
+                            chunk.gameObject.SetActive(true);
+                            _currentlyEnabledChunks.Add(chunk);
+                        }
                     }
                 }
             }
         }
+
+        _lastPlayerChunk = relPos;
     }
 
 
-    private void CreateChunk(Vector3Int chunkPos)
+    private void CreateChunk(Vector3Int chunkglobalPos)
     {
-        Chunk chunk = Instantiate(chunkPrefab, chunkPos, Quaternion.identity, transform);
+        Chunk chunk = Instantiate(chunkPrefab, chunkglobalPos, Quaternion.identity, transform);
         chunk.Initialize(MeshGenerator, NoiseGenerator);
 
-        Vector3 boundsCenterPos = chunkPos + (Vector3.one * ((MeshGenerator.ChunkSize - 1) / 2));
+        Vector3 boundsCenterPos = chunkglobalPos + (Vector3.one * ((MeshGenerator.ChunkSize - 1) / 2));
 
         chunk.Bounds = new Bounds(boundsCenterPos, Vector3.one * (MeshGenerator.ChunkSize - 1));
-        chunk.name = $"{ToChunkPosition(chunkPos).ToString()}";
+        chunk.name = $"{ToChunkPosition(chunkglobalPos).ToString()}";
 
-        _chunkDictionary[chunkPos] = chunk;
-        _currentlyEnabledChunks.Add(chunk);
+        _chunkDictionary[chunkglobalPos] = chunk;
+
+        bool visible = InRenderDistance(_lastPlayerChunk, ToChunkPosition(chunkglobalPos), renderDistanceHorizontal, renderDistanceVertical);
+        chunk.gameObject.SetActive(visible);
+        if (visible) _currentlyEnabledChunks.Add(chunk);
     }
 
 	public void EditWeights(Vector3 globalPosition, float brushSize) {

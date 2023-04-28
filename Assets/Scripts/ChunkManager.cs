@@ -41,7 +41,8 @@ public class ChunkManager : MonoBehaviour
         int count = Mathf.Min(size, _buildQueue.Count);
         for (int i = 0; i < count; i++)
         {
-            var chunkPos = _buildQueue.Dequeue();
+            var chunkId = _buildQueue.Dequeue();
+            var chunkPos = ToGlobalPosition(chunkId);
             CreateChunk(chunkPos);
         }
     }
@@ -65,17 +66,19 @@ public class ChunkManager : MonoBehaviour
             {
                 for (int z = -renderDistanceHorizontal + relPos.z; z < renderDistanceHorizontal + relPos.z; z++)
                 {
+                    Vector3Int chunkId = new Vector3Int(x, y, z);
+
                     Vector3Int chunkglobalPos = 
                         new Vector3Int(x * (MeshGenerator.ChunkSize - 1), y * (MeshGenerator.ChunkSize - 1), z * (MeshGenerator.ChunkSize - 1));
 
-                    if (!_chunkDictionary.ContainsKey(chunkglobalPos))
+                    if (!_chunkDictionary.ContainsKey(chunkId))
                     {
-                        _buildQueue.Enqueue(chunkglobalPos, ManhattanDistance(Vector3Int.FloorToInt(player.transform.position), chunkglobalPos));
-                        _chunkDictionary.Add(chunkglobalPos, null);
+                        _buildQueue.Enqueue(chunkId, ManhattanDistance(Vector3Int.FloorToInt(player.transform.position), chunkglobalPos));
+                        _chunkDictionary.Add(chunkId, null);
                     }
                     else
                     {
-                        Chunk chunk = _chunkDictionary[chunkglobalPos];
+                        Chunk chunk = _chunkDictionary[chunkId];
                         if (chunk != null)
                         {
                             chunk.gameObject.SetActive(true);
@@ -126,6 +129,15 @@ public class ChunkManager : MonoBehaviour
 					Mathf.FloorToInt((globalPosition.z) / (MeshGenerator.ChunkSize - 1))
 				);
 	}
+
+    Vector3Int ToGlobalPosition(Vector3 chunkId)
+    {
+        return new Vector3Int(
+                    Mathf.FloorToInt((chunkId.x) * (MeshGenerator.ChunkSize - 1)),
+                    Mathf.FloorToInt((chunkId.y) * (MeshGenerator.ChunkSize - 1)),
+                    Mathf.FloorToInt((chunkId.z) * (MeshGenerator.ChunkSize - 1))
+                );
+    }
 
     bool InRenderDistance(Vector3Int a, Vector3Int b, int horizontal, int vertical)
     {

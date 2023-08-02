@@ -1,38 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    CharacterController characterController;
-
     [SerializeField] float speed = 20f;
-    [Header("Jump")]
-    [SerializeField] float jumpHeight = 1f;
-    [SerializeField] float gravity = -9.81f;
-    [SerializeField] bool useDoubleJump;
-
-    bool canDoubleJump;
-
-    Vector3 vel;
 
     private void Awake() {
-        characterController = GetComponent<CharacterController>();
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        canDoubleJump = false;
     }
 
 	void Update()
     {
-        if (characterController.isGrounded && vel.y < 0) {
-            vel.y = -2f;
-
-            canDoubleJump = true;
-        }
-
         float x = Input.GetAxis("Horizontal"), z = Input.GetAxis("Vertical");
 
         Vector3 move = transform.right * x + transform.forward * z;
@@ -41,22 +19,16 @@ public class PlayerMovement : MonoBehaviour
             move /= move.magnitude;
 		}
 
-        if (Input.GetKeyDown(KeyCode.Space) && characterController.isGrounded) {
-            Jump();
+        move *= speed;
+
+        if (Input.GetKey(KeyCode.Space)) {
+            move.y = speed;
         }
-        if (useDoubleJump) {
-            if (Input.GetKeyDown(KeyCode.Space) && !characterController.isGrounded && canDoubleJump) {
-                Jump();
-                canDoubleJump = false;
-            }
-		}
+        else if (Input.GetKey(KeyCode.LeftShift))
+        {
+            move.y = -speed;
+        }
 
-        vel.y += gravity * Time.deltaTime;
-
-        characterController.Move(move * speed * Time.deltaTime + vel * Time.deltaTime);
-    }
-
-    void Jump() {
-        vel.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        transform.position += move * Time.deltaTime;
     }
 }

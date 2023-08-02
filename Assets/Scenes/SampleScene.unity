@@ -155,8 +155,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 100, y: -59.2}
-  m_SizeDelta: {x: 160, y: 88.39502}
+  m_AnchoredPosition: {x: 100, y: -80.71}
+  m_SizeDelta: {x: 160, y: 131.41614}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &79991222
 MonoBehaviour:
@@ -190,15 +190,20 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Controls:
+  m_Text: '-- CONTROLS --
 
-    UP - W
+    FORWARD - W
 
-    DOWN - S
+    BACK - S
 
     LEFT - A
 
-    RIGHT - D'
+    RIGHT
+    - D
+
+    UP - SPACE
+
+    DOWN - LEFT SHIFT'
 --- !u!222 &79991223
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -322,7 +327,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fpsLabel: {fileID: 2140116000}
-  frameRange: 60
+  frameRange: 120
 --- !u!1 &641490975
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,7 +337,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 641490977}
-  - component: {fileID: 641490976}
   - component: {fileID: 641490978}
   m_Layer: 0
   m_Name: Player
@@ -341,24 +345,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!143 &641490976
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 641490975}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.7
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &641490977
 Transform:
   m_ObjectHideFlags: 0
@@ -367,7 +353,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 641490975}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 20, z: 0}
+  m_LocalPosition: {x: 0, y: 60, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 963194228}
@@ -386,10 +372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a4eaaf094b962448233642e2f0c91d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  jumpHeight: 1
-  gravity: -9.81
-  useDoubleJump: 1
+  speed: 20
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -536,9 +519,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab273cbcb72582841974bba3477a151d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderDistanceHorizontal: 6
+  renderDistanceHorizontal: 8
   renderDistanceVertical: 4
-  maxChunkBuildPerFrame: 2
+  maxChunkBuildPerFrame: 4
   player: {fileID: 641490977}
   chunkPrefab: {fileID: 1256522958114542827, guid: 4d3c169f812c5044c83ecc9ffb0d37dd,
     type: 3}
@@ -574,9 +557,9 @@ MonoBehaviour:
   SphericalTerrainShader: {fileID: 7200000, guid: e22b63200c5f0ad4c844c64d562813da,
     type: 3}
   NoiseType: 0
-  noiseScale: 0.2
-  amplitude: 60
-  frequency: 0.005
+  noiseScale: 1
+  amplitude: 40
+  frequency: 0.002
   octaves: 7
   groundPercent: 0.2
 --- !u!114 &998498869

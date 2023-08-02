@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Timers;
 using UnityEngine;
 
 public class ChunkWeightUpdater : MonoBehaviour
@@ -32,9 +33,9 @@ public class ChunkWeightUpdater : MonoBehaviour
 		Shader.Dispatch(0, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8, MeshGenerator.ChunkSize / 8);
 
 		_weightsBuffer.GetData(chunk.Weights);
-	}
+    }
 
-	void CreateBuffers() {
+    void CreateBuffers() {
 		_weightsBuffer = new ComputeBuffer(MeshGenerator.ChunkSize * MeshGenerator.ChunkSize * MeshGenerator.ChunkSize, sizeof(float));
 	}
 

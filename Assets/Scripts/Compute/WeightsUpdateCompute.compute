@@ -21,6 +21,6 @@ void UpdateWeights (uint3 id : SV_DispatchThreadID)
 
     if (distance(pos, _HitPosition) <= _BrushSize)
     {
-        _Weights[indexFromCoord(id.x, id.y, id.z)] += 1;
+        _Weights[indexFromCoord(id.x, id.y, id.z)] = min(_Weights[indexFromCoord(id.x, id.y, id.z)] + 1, 5);
     }
 }

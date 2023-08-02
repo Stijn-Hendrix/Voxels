@@ -19,6 +19,9 @@ public class PlayerMovement : MonoBehaviour
     private void Awake() {
         characterController = GetComponent<CharacterController>();
 
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         canDoubleJump = false;
     }
 
